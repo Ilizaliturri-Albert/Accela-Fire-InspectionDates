@@ -1,0 +1,50 @@
+var message = "";
+var result = "0"; //assume success
+
+try {
+	var getResult = aa.cap.getByAppType("Fire", null, null, "Fire Occupancy");
+	if (getResult.getSuccess()){ 
+		var capIds = getResult.getOutput();
+		var numprocessed = 0;
+		var numrecords = capIds.length;
+		var assignDone = false;
+		
+		for (var capId in capIds){
+			assignDone = false;
+			var getInsp = aa.inspection.getInspection(capsIds[capId].getCapID());
+			if (getInsp.getSuccess()){ 
+				var insps = getInsp.getOutput();
+				for (var insp in insps){ 
+					if (insps[insp].getInspectionStatus() == "" && insps[insps].getInspectionType().inexOf("Fire Occ-Bureau Annual")
+					{
+						var iNumber = insps[insp].getIdNumber();
+						
+						iObjResult = aa.inspection.getInspection(capIds[capId].getCapID(),iNumber);
+						
+						iObj = iObjResult.getOutput();
+
+						inspTypeResult = aa.inspection.getInspectionType(iObj.getInspection().getInspectionGroup(), iObj.getInspectionType())
+
+						inspTypeArr = inspTypeResult.getOutput();
+						
+						inspSchedDate = aa.inspection.editScheduledDate (scheduledDate, [capId])
+					}
+				}
+			}
+		}
+	}
+ }
+}
+catch(err){
+ message = "Error " + err;
+}
+
+//end user code
+aa.env.setValue("ScriptReturnCode", result);
+aa.env.setValue("ScriptReturnMessage", message);
+
+
+//possible functions needed 
+// scheduleInspectDate (inspDesc, inspDate, [inspectorID, inspTime, inspComm])
+// checkInspectionResult (inspDesc, inspResult)
+// editScheduledDate (scheduledDate, [capId])
