@@ -1,44 +1,50 @@
-var message = "";
-var result = "0"; //assume success
+var message = "Event Test";
+var result = "1"; //assume success
+
+aa.print("Start");
 
 try {
-	var getResult = aa.cap.getByAppType("Fire", null, null, "Fire Occupancy");
-	if (getResult.getSuccess()){ 
+	var getResult = aa.cap.getByAppType("Fire",null,null,"Fire Occupancy");
+	if(getResult.getSuccess()){
 		var capIds = getResult.getOutput();
-		var numprocessed = 0;
+		var numprocessed = 0; 
 		var numrecords = capIds.length;
-		var assignDone = false;
+		//var inspectorObj = null;
+		//var rescheduleDone = false;
+		var inspprocessed = 0;
 		
-		for (var capId in capIds){
-			assignDone = false;
-			var getInsp = aa.inspection.getInspection(capsIds[capId].getCapID());
-			if (getInsp.getSuccess()){ 
+		for(var capId in capIds){
+			//rescheduleDone = false;
+			var getInsp = aa.inspection.getInspections(capIds[capId].getCapID());
+			if(getInsp.getSuccess()){
 				var insps = getInsp.getOutput();
-				for (var insp in insps){ 
-					if (insps[insp].getInspectionStatus() == "" && insps[insps].getInspectionType().inexOf("Fire Occ-Bureau Annual")
+				for(var insp in insps){
+					if(insps[insp].getInspectionStatus() == "Schedule" && insps[insp].getInspectionType() == "Fire Occ-Bureau Annual" && insps[insp].getAuditStatus() == "A") {
 					{
-						var iNumber = insps[insp].getIdNumber();
+						var iNumber = insps[insp].getIdNumber(); //Inspection ID
+						var capIdModel = aa.cap.getCapID(capIds[capId].getCapID().getID1(),capIds[capId].getCapID().getID2(),capIds[capId].getCapID().getID3()); ID Model
+						iObjectResult = aa.inspection.getInspection(capIds[capId].getCapID(), iNumber); //Retrieves Inspection wrapped in Inspection Script Model Object
 						
-						iObjResult = aa.inspection.getInspection(capIds[capId].getCapID(),iNumber);
 						
-						iObj = iObjResult.getOutput();
-
-						inspTypeResult = aa.inspection.getInspectionType(iObj.getInspection().getInspectionGroup(), iObj.getInspectionType())
-
-						inspTypeArr = inspTypeResult.getOutput();
 						
-						inspSchedDate = aa.inspection.editScheduledDate (scheduledDate, [capId])
+					}
+					inspprocessed++;
 					}
 				}
+			numprocessed = numprocessed + 1; //Number of inspections processed with changes
 			}
 		}
+		message = numprocessed + " records processed out of " + numrecords + ". " + inspprocessed;
 	}
+	else{
+		message = "Get failed " + getResult.getErrorMessage();
  }
-}
+ }
 catch(err){
  message = "Error " + err;
 }
 
+aa.print("End");
 //end user code
 aa.env.setValue("ScriptReturnCode", result);
 aa.env.setValue("ScriptReturnMessage", message);
